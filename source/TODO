@@ -1,0 +1,42 @@
+Game.cpp:71. glutMainLoop should loop on gameMainLoop function, then i probably will have to draw everything manually, for example, triggering redraw each time i get a mouseClick triggered???
+And the same with that doSmoothMove... I hope it works
+Also i need to set mouse function and stuff like that through the same disgusting pointer to Game, because it is the only thing that has Graphics as a field
+
+
+
+___________________________________
+turnCorrect func;
+reshapeFunc;
+
+write a bash script which does shit like uxterm -e "blahblahblah; bash"
+
+
+__________________________________
+
+mouse function does allow to pick up black pieces
+mouse drag needs to have the same shit as mouse click
+turn passes wrong (obviously), i didnt change the second part of mouseClick
+
+
+_________________________________
+Bot.cpp:157
+I decided to move from class Tree to just a function, though it's getting enormous, but oh well
+I think I will divide the boardPasrer::getNextTurn() to 2 functions for black and white cases, just to make it more readable (readable functions in 2k17 OMEGALUL)
+
+_________________________________
+I forgot about making multiple turns(when you kill a piece), not sure how to implement that yet, probably by calling minmax function with some special parameters and also choosing only between turns where 'i' kill something if i can kill anything at this board state.
+
+_________________________________
+Now we are all okay(probably), so all I need is to finish heuristic function, counting all the possible moves and pieces count, but if there is a possibility to kill something, then it will go even deeper, but just until there is no possibility to kill at this turn. If it doesn't find the possibility to kill, then it just goes counting + for black pieces and turns and - for white pieces and turns(?). Heuristic function is only called at the black turn, so we dont need to count white's possibilities to kill(?)
+
+_________________________________
+The only thing left(probably) is a bug where no one can do multiple beating turn. Also still no smoothMove funciton, probably time to implement it now that everything starts to work
+
+_________________________________
+Still no multiple beating, and for some reason bot doesn't understand when it can kill something as a king
+
+_________________________________
+in Game make FPS constans and base timerFunc on 1000/FPS, also make startSmoothMove func to actually initialize all variables needed (since pieces are moving diagonally, its easier to base movement on one of the sides of the squares). At the end doSmoothMove func calls mainLoop which checks if it ended, and if it does, disables the timer and enables idle func.
+
+
+Only shaders left, with texture coordinates and such
