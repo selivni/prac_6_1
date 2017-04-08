@@ -47,6 +47,7 @@ class Graphics
 
 
 	int windowHeight, windowWidth;
+	int offsetX, offsetY;
 	int vertSize, horSize;
 	float vertStep, horStep;
 

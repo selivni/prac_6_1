@@ -40,3 +40,6 @@ in Game make FPS constans and base timerFunc on 1000/FPS, also make startSmoothM
 
 
 Only shaders left, with texture coordinates and such
+
+_________________________________
+Reshape func!

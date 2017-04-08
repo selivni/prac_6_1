@@ -20,6 +20,9 @@ Graphics::Graphics(int boardSizeVert, int boardSizeHor)
 		for (int j = 0; j < boardSizeHor; j++)
 			board[i][j] = 0;
 	}
+	windowHeight = WINDOW_HEIGHT;
+	windowWidth = WINDOW_WIDTH;
+	offsetX = offsetY = 0;
 	vertSize = boardSizeVert;
 	horSize = boardSizeHor;
 	vertStep = 2 / (float) boardSizeVert;
@@ -56,10 +59,12 @@ void Graphics::init()
 
 void Graphics::displayFunc()
 {
-	glClear(GL_COLOR_BUFFER_BIT); CHECK_GL_ERRORS
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECK_GL_ERRORS
 	drawSquares();
 	drawPieces();
 	glutSwapBuffers(); CHECK_GL_ERRORS
+	glDisable(GL_DEPTH_TEST);
 }
 
 void Graphics::drawSquares()
@@ -227,14 +232,33 @@ void Graphics::shutDown()
 
 void Graphics::reshapeFunc(int newWidth, int newHeight)
 {
-	windowWidth = newWidth;
-	windowHeight = newHeight;
+	if (newWidth < newHeight)
+	{
+		glViewport(0, newHeight / 2 - newWidth / 2, newWidth,
+				   newWidth);
+		windowWidth = windowHeight = newWidth;
+		offsetY = newHeight / 2 - newWidth / 2;
+		offsetX = 0;
+	}
+	else
+	{
+		glViewport(newWidth / 2 - newHeight / 2, 0,
+				   newHeight, newHeight);
+		windowHeight = windowWidth = newHeight;
+		offsetX = newWidth / 2 - newHeight / 2;
+		offsetY = 0;
+	}
+
 	cout << "Window reshaped to "<< newWidth << 'x' << newHeight << endl;
 }
 
 void Graphics::mouseDrag(int x, int y)
 {
 //	cout << "mouseDrag called" << endl;
+	x -= offsetX;
+	y -= offsetY;
+	if (x >= windowWidth || y >= windowHeight || x < 0 || y < 0)
+		return;
 	if (captured)
 	{
 		float moddX = 2 * x / (float) windowWidth;
@@ -244,14 +268,18 @@ void Graphics::mouseDrag(int x, int y)
 			cout << "Mouse drag error: piece captured doesnt exist" << endl;
 			exit(1);
 		}
-		piecesPositions[board[capturedI][capturedJ]->index] = VM::vec4(moddX - 1, -(moddY - 1), 0, 0);
+		piecesPositions[board[capturedI][capturedJ]->index] = VM::vec4(moddX - 1, -(moddY - 1), -1.0, 0);
 		glutPostRedisplay();
 	}
 }
 
 void Graphics::mouseClick(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && !turnDone)
+	x -= offsetX;
+	y -= offsetY;
+	if (x >= windowWidth || y >= windowHeight || x < 0 || y < 0)
+		return;
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && !turnDone && !captured)
 	{
 		float moddX = 2 * x / (float) windowWidth;
 		float moddY = 2 * y / (float) windowHeight;
@@ -262,7 +290,7 @@ void Graphics::mouseClick(int button, int state, int x, int y)
 //		cout << i << ' ' << j << ' ' << board[i][j] << endl;
 		if (board[i][j] != 0 && board[i][j]->color == WHITE)
 		{
-			piecesPositions[board[i][j]->index] = VM::vec4(moddX - 1,  - (moddY - 1), 0, 0);
+			piecesPositions[board[i][j]->index] = VM::vec4(moddX - 1,  - (moddY - 1), -0.99, 0);
 			capturedI = i;
 			capturedJ = j;
 			captured = true;
@@ -422,6 +450,7 @@ void Graphics::startSmoothMove(char gameTurn[5], int fps, int turnTime)
 		uturn[2] = KILL;
 	else
 		uturn[2] = NO_KILL;
+	piecesPositions[board[uturn[0]][uturn[1]]->index].z = -0.9;
 	makeTurn(uturn);
 	for (int i = 0; i < 5; i++)
 		smoothTurn[i] = uturn[i];
@@ -556,7 +585,7 @@ vector<VM::vec4> Graphics::generateSquaresPositions()
 	result.clear();
 	for (int j = 0; j < vertSize; j++)
 		for (int i = 0; i < horSize; i++)
-			result.push_back(VM::vec4(i * horStep - 1, j * vertStep - 1, 0, 0));
+			result.push_back(VM::vec4(i * horStep - 1, j * vertStep - 1, 1, 0));
 	return result;
 }
 
