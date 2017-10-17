@@ -6,3 +6,5 @@ You will need the following libraries:
 	libglu1-mesa-dev
 To make: run make from this directory
 To run: run ./prac1 from directory bin
+
+Controls are fairly obvious
